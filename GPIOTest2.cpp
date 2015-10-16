@@ -21,6 +21,18 @@ void sig_handler(int sig);
 
 bool ctrl_c_pressed = false;
 
+struct Button
+{
+    string buttonName;
+    string gpio;
+    GPIOClass* object;
+    string inputState;
+    string keypadDown;
+    string keypadRelease;
+}
+
+
+
 int main(void)
 {
 
@@ -36,8 +48,8 @@ int main(void)
 
     // would be nice to store our object instances in here
     // experiment
-    //string gpios [10] = {"13", "6", "25", "22", "17", "16", "12", "5", "24", "27"};
-    //std::map<string, GPIOClass*> my_gpios;
+    string gpios [10] = {"13", "6", "25", "22", "17", "16", "12", "5", "24", "27"};
+    std::map<string, GPIOClass*> my_gpios;
     //end experiment
 
     string inputstate1;
