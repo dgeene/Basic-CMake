@@ -46,27 +46,28 @@ int main(void)
         return -1; 
     }
 
-    // would be nice to store our object instances in here
-    // experiment
+    // experiment - gross test code please ignore
     string gpios [10] = {"13", "6", "25", "22", "17", "16", "12", "5", "24", "27"};
+    string gpios2 [2] = {"13", "6"};
+    string keyDown [10] = {"c", "", "", "", "", "", "", "", "", ""};
+    string keyUP [10] = {"C", "", "", "", "", "", "", "", "", ""};
     //std::map<string, GPIOClass*> my_gpios;
-    Button instances [10];
+    Button instances [10]; //this will hold our structs
 
-    for (string* p = &gpios[0]; p != &gpios[10]; ++p) {
-        cout << *p << endl;
-        cout << p << endl;
+    for (int i = 0; i < 2; i++) {
+        cout << gpios[i] << endl;
+        instances[i] = new Button;
+        instances[i].buttonName = "my button";
+        instances[i].gpio = gpios[i]; 
+        instances[i].gpioObject = new GPIOClass(gpios[i]);
+        instances[i].gpioObject->export_gpio();
+        instances[i].gpioObject->setdir_gpio("in");
+        instances[i].keypadDown = "key down"; 
+        instances[i].keypadRelease = "key up"; 
     }
     //end experiment
 
     string inputstate1;
-    GPIOClass* gpio17 = new GPIOClass("17");
-    gpio17->export_gpio();
-    gpio17->setdir_gpio("in");
-
-    string inputstate2;
-    GPIOClass* gpio22 = new GPIOClass("22");
-    gpio22->export_gpio();
-    gpio22->setdir_gpio("in");
 
 
     cout << " gpio pins exported and direction set" << endl;
@@ -76,6 +77,11 @@ int main(void)
     while(1)
     {
         usleep(500000); //sleep .5 seconds
+
+        for (Button* p = &instances[0]; p != &instances[2]; ++p) {
+            cout << instances->gpio <<endl;
+        }
+/*
         gpio17->getval_gpio(inputstate1); // read state of gpio 17
         cout << " current state of gpio pin is " << inputstate1 <<endl;
 
@@ -126,7 +132,7 @@ int main(void)
                 cout << "input pin state us definetly unpressed. That was just noise" << endl;
 
         }
-
+*/
 
 
 
@@ -135,13 +141,14 @@ int main(void)
             // we should store each gpio object in an array and loop through it
             cout << "Ctrl^C pressed" << endl;
             cout << "unexporting pins and deallocating gpi objects" << endl;
-            gpio17->unexport_gpio();
-            delete gpio17;
-            gpio17 = 0;
 
-            gpio22->unexport_gpio();
-            delete gpio22;
-            gpio22 = 0;
+            // attempt to clean up my mess lol
+            for (int j = 0; j < 2; j++) {
+                instances[j].gpioObject->unexport_gpio();
+                delete instances[j].gpioObject;
+                instances[j].gpioObject = 0;
+                // delete instances[j]; // delete expects a pointer?
+            }
             break;
         }
 
