@@ -26,9 +26,7 @@ int main(void)
 
 
     string inputstate;
-    // GPIOClass* gpio4 = new GPIOClass("4");
     GPIOClass* gpio17 = new GPIOClass("17");
-
     gpio17->export_gpio();
 
     cout << " gpio pins exported" << endl;
@@ -45,8 +43,8 @@ int main(void)
 
         if(inputstate == "0") // if 0 i.e. button pressed
         {
-            cout << "input state is pressed .n Will check input pin state again in 7ms " <<endl;
-            usleep(7000);
+            cout << "input state is pressed .n Will check input pin state again in 4ms " <<endl;
+            usleep(4000);
             cout << "checking again ....." <<endl;
             gpio17->getval_gpio(inputstate); // checking again to ensure that button is pressed and not just noise
 
