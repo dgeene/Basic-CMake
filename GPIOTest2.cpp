@@ -25,11 +25,11 @@ struct Button
 {
     string buttonName;
     string gpio;
-    GPIOClass* object;
+    GPIOClass* gpioObject;
     string inputState;
     string keypadDown;
     string keypadRelease;
-}
+};
 
 
 
@@ -49,7 +49,13 @@ int main(void)
     // would be nice to store our object instances in here
     // experiment
     string gpios [10] = {"13", "6", "25", "22", "17", "16", "12", "5", "24", "27"};
-    std::map<string, GPIOClass*> my_gpios;
+    //std::map<string, GPIOClass*> my_gpios;
+    Button instances [10];
+
+    for (string* p = &gpios[0]; p != &gpios[10]; ++p) {
+        cout << *p << endl;
+        cout << p << endl;
+    }
     //end experiment
 
     string inputstate1;
