@@ -48,15 +48,13 @@ int main(void)
 
     // experiment - gross test code please ignore
     string gpios [10] = {"13", "6", "25", "22", "17", "16", "12", "5", "24", "27"};
-    string gpios2 [2] = {"13", "6"};
     string keyDown [10] = {"c", "", "", "", "", "", "", "", "", ""};
     string keyUP [10] = {"C", "", "", "", "", "", "", "", "", ""};
     //std::map<string, GPIOClass*> my_gpios;
     Button instances [10]; //this will hold our structs
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 10; i++) {
         cout << gpios[i] << endl;
-        instances[i] = new Button;
         instances[i].buttonName = "my button";
         instances[i].gpio = gpios[i]; 
         instances[i].gpioObject = new GPIOClass(gpios[i]);
@@ -72,68 +70,50 @@ int main(void)
 
     cout << " gpio pins exported and direction set" << endl;
 
+    
+    // start out with all false
+    bool currentbuttonstate[10];
 
 
     while(1)
     {
-        usleep(500000); //sleep .5 seconds
-
-        for (Button* p = &instances[0]; p != &instances[2]; ++p) {
-            cout << instances->gpio <<endl;
-        }
+        usleep(100000); //sleep .3 seconds
 /*
-        gpio17->getval_gpio(inputstate1); // read state of gpio 17
-        cout << " current state of gpio pin is " << inputstate1 <<endl;
+        // my array
+        bool buttonpressed[10];
+        for( int ii = 0; ii < sizeof(buttonpressed); ii++ ) buttonpressed[ii] = false;
 
-        gpio22->getval_gpio(inputstate2); // read state of gpio 17
-        cout << " current state of gpio pin is " << inputstate1 <<endl;
+        for every key
+             if pressed { buttonpressed[ii] = true; }
 
-        if(inputstate1 == "0") // if 0 i.e. button pressed
-        {
-            cout << "input state is pressed .n Will check input pin state again in 4ms " <<endl;
-            usleep(4000);
-            cout << "checking again ....." <<endl;
-            gpio17->getval_gpio(inputstate1); // checking again to ensure that button is pressed and not just noise
+        usleep 4000;
 
-            if(inputstate1 == "0")
-            {
-                cout << "input pin was definetly pressed. Turning LED on" << endl;
-                cout << "waiting until pin is unpressed...." << endl;
-                while(inputstate1 == "0") {
-                    gpio17->getval_gpio(inputstate1);
-                };
-                cout << "pin is unpressed" << endl;
+        
+        for every key
+             if (pressed && buttonpressed[ii] == true) { cout << buttonchar; }
 
-            }
-            else
-                cout << "input pin state us definetly unpressed. That was just noise" << endl;
-
-        }
-
-
-        if(inputstate2 == "0") // if 0 i.e. button pressed
-        {
-            cout << "input state is pressed .n Will check input pin state again in 4ms " <<endl;
-            usleep(4000);
-            cout << "checking again ....." <<endl;
-            gpio22->getval_gpio(inputstate2); // checking again to ensure that button is pressed and not just noise
-
-            if(inputstate2 == "0")
-            {
-                cout << "input pin was definetly pressed. Turning LED on" << endl;
-                cout << "waiting until pin is unpressed...." << endl;
-                while(inputstate2 == "0") {
-                    gpio22->getval_gpio(inputstate2);
-                };
-                cout << "pin is unpressed" << endl;
-
-            }
-            else
-                cout << "input pin state us definetly unpressed. That was just noise" << endl;
-
-        }
 */
 
+        for (int k=0; k<10; k++) {
+            Button thisButton = instances[k];
+            thisButton.gpioObject->getval_gpio(thisButton.inputState);
+            //cout << "current state of gpio pin " << thisButton.gpio << " is: " << thisButton.inputState << endl;
+            if (thisButton.inputState == "0") {
+
+                usleep(4000);
+                thisButton.gpioObject->getval_gpio(thisButton.inputState); 
+                if (thisButton.inputState == "0") {
+                    // button was definitely pressed at this point    
+                    cout << "Button " << thisButton.gpio << " was pressed." << endl;
+
+                    // this spikes the cpu
+                    while(thisButton.inputState == "0") {
+                        thisButton.gpioObject->getval_gpio(thisButton.inputState);
+                    };
+                    
+                }
+            }
+        }
 
 
         // allows program to exit gracefully
@@ -143,7 +123,7 @@ int main(void)
             cout << "unexporting pins and deallocating gpi objects" << endl;
 
             // attempt to clean up my mess lol
-            for (int j = 0; j < 2; j++) {
+            for (int j = 0; j < 10; j++) {
                 instances[j].gpioObject->unexport_gpio();
                 delete instances[j].gpioObject;
                 instances[j].gpioObject = 0;
