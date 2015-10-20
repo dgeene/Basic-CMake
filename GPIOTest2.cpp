@@ -52,7 +52,6 @@ int main(void)
     Button instances [MAX_BUTTONS]; //hold our structs
 
     for (int i = 0; i < MAX_BUTTONS; i++) {
-        cout << gpios[i] << endl;
         instances[i].buttonName = pinName[i];
         instances[i].gpio = gpios[i]; 
         instances[i].gpioObject = new GPIOClass(gpios[i]);
@@ -63,7 +62,7 @@ int main(void)
     }
 
 
-    cout << " gpio pins exported and direction set" << endl;
+    cout << "gpio pins exported and direction set. Press some buttons!" << endl;
  
     
     // persistent button state outside of loops
@@ -78,8 +77,9 @@ int main(void)
         bool buttonpressed[MAX_BUTTONS];
         for( int ii = 0; ii < sizeof( buttonpressed ); ii++ ) buttonpressed[ii] = false;
 
-        //for every key
-        //     if pressed { buttonpressed[ii] = true; }
+
+        //for every key.. test to see if I think its pressed
+        //  if i think it might be pressed make note.
         for (int k=0; k<MAX_BUTTONS; k++) {
             Button thisButton = instances[k];
             thisButton.gpioObject->getval_gpio(thisButton.inputState);
@@ -93,8 +93,7 @@ int main(void)
 
         usleep(4000);
 
-        //for every key
-        //     if (pressed && buttonpressed[ii] == true) { cout << buttonchar; }
+        //for every key again... test to see if its pressed
         for (int l=0; l<MAX_BUTTONS; l++) {
             Button thisButton = instances[l];
             thisButton.gpioObject->getval_gpio(thisButton.inputState);
@@ -104,30 +103,30 @@ int main(void)
             else if( thisButton.inputState == "1" && buttonpressed[l] == false ) buttonpressed[l] = false;
             else buttonpressed[l] = buttonstate[l];
 
+
             for( int ii = 0; ii < MAX_BUTTONS; ii++ ) {
+                /* test if my state changed
+                 *
+                 * -Keydown-
+                 * buttonpressed: 1
+                 * buttonstate:   0
+                 *
+                 * -Keyup-
+                 * buttonpressed: 0
+                 * buttonstate:   1
+                 */
                 if( buttonpressed[ii] != buttonstate[ii] )
                 {
+                    if ( buttonpressed[ii] == true )
+                    {
+                        cout << instances[ii].buttonName << " pressed. Letter: " << instances[ii].keypadDown << endl;
+                    }
+                    else {
+                        cout << instances[ii].buttonName << " depressed. Letter: " << instances[ii].keypadRelease << endl;
+                    }
                     buttonstate[ii] = buttonpressed[ii];
-                    cout << "X" << endl;
                 }
             }
-
-/*
-            if (thisButton.inputState == "0" && buttonpressed[l] == true) {
-                buttonstate[l] = true;
-                //press and hold here
-                if( buttonstate[l] == buttonpressed[l] ) {
-                    cout << "Pressed: " << thisButton.buttonName << " Keydown: " << thisButton.keypadDown << endl;
-                    buttonpressed[l] = buttonstate[l];
-                }
-            } else if (thisButton.inputState == "1" && buttonstate[l] == true) {
-                cout << "Keyup: " << thisButton.keypadRelease << endl;
-                buttonstate[l] = false;
-            }
-*/
-
-
-
         }
 
 
@@ -143,7 +142,6 @@ int main(void)
                 instances[j].gpioObject->unexport_gpio();
                 delete instances[j].gpioObject;
                 instances[j].gpioObject = 0;
-                // delete instances[j]; // delete expects a pointer?
             }
             break;
         }
