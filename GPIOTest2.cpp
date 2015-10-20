@@ -74,23 +74,38 @@ int main(void)
 
     while(1)
     {
-        usleep(100000); //sleep .3 seconds
-/*
+        usleep(100000); //sleep 100 milliseconds
+
         // my array
-        bool buttonpressed[10];
-        for( int ii = 0; ii < sizeof(buttonpressed); ii++ ) buttonpressed[ii] = false;
+        bool buttonpressed[10] = {false};
+        //re-initialize as all false
+        //for( int ii = 0; ii < sizeof(buttonpressed)/sizeof(buttonpressed[0]); ii++ ) {buttonpressed[ii] = false};
 
-        for every key
-             if pressed { buttonpressed[ii] = true; }
+        //for every key
+        //     if pressed { buttonpressed[ii] = true; }
+        for (int k=0; k<10; k++) {
+            Button thisButton = instances[k];
+            thisButton.gpioObject->getval_gpio(thisButton.inputState);
+            if (thisButton.inputState == "0") { // 0 means pressed
+                buttonpressed[k] = true;
+            }
+        }
 
-        usleep 4000;
+        usleep(4000);
 
-        
-        for every key
-             if (pressed && buttonpressed[ii] == true) { cout << buttonchar; }
 
-*/
+        //for every key
+        //     if (pressed && buttonpressed[ii] == true) { cout << buttonchar; }
+        for (int l=0; l<10; l++) {
+            Button thisButton = instances[l];
+            thisButton.gpioObject->getval_gpio(thisButton.inputState);
+            if (thisButton.inputState == "0" && buttonpressed[l] == true) {
+                cout << "Pressed: " << thisButton.buttonName << "Keydown: " << thisButton.keypadDown << endl;
+            }
+        }
 
+
+/*
         for (int k=0; k<10; k++) {
             Button thisButton = instances[k];
             thisButton.gpioObject->getval_gpio(thisButton.inputState);
@@ -113,6 +128,7 @@ int main(void)
                 }
             }
         }
+*/
 
 
         // allows program to exit gracefully
