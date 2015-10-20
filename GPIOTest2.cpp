@@ -68,18 +68,16 @@ int main(void)
     cout << " gpio pins exported and direction set" << endl;
 
     
-    // start out with all false
-    bool currentbuttonstate[10];
+    // persistent button state outside of loops
+    bool currentbuttonstate[10] = {false};
 
 
     while(1)
     {
         usleep(100000); //sleep 100 milliseconds
 
-        // my array
+        // init a temp button state as false
         bool buttonpressed[10] = {false};
-        //re-initialize as all false
-        //for( int ii = 0; ii < sizeof(buttonpressed)/sizeof(buttonpressed[0]); ii++ ) {buttonpressed[ii] = false};
 
         //for every key
         //     if pressed { buttonpressed[ii] = true; }
@@ -88,7 +86,7 @@ int main(void)
             thisButton.gpioObject->getval_gpio(thisButton.inputState);
             if (thisButton.inputState == "0") { // 0 means pressed
                 buttonpressed[k] = true;
-            }
+            }         
         }
 
         usleep(4000);
@@ -100,35 +98,30 @@ int main(void)
             Button thisButton = instances[l];
             thisButton.gpioObject->getval_gpio(thisButton.inputState);
             if (thisButton.inputState == "0" && buttonpressed[l] == true) {
-                cout << "Pressed: " << thisButton.buttonName << "Keydown: " << thisButton.keypadDown << endl;
+                //press and hold here
+                currentbuttonstate[l] = true;
+                cout << "Pressed: " << thisButton.buttonName << " Keydown: " << thisButton.keypadDown << endl;
+            } else if (thisButton.inputState == "1" && currentbuttonstate[l] == true) {
+                cout << "Keyup: " << thisButton.keypadRelease << endl;
+                currentbuttonstate[l] = false;
             }
-        }
-
 
 /*
-        for (int k=0; k<10; k++) {
-            Button thisButton = instances[k];
-            thisButton.gpioObject->getval_gpio(thisButton.inputState);
-            //cout << "current state of gpio pin " << thisButton.gpio << " is: " << thisButton.inputState << endl;
-            if (thisButton.inputState == "0") {
-
-                usleep(4000);
-                thisButton.gpioObject->getval_gpio(thisButton.inputState); 
-                if (thisButton.inputState == "0") {
-                    // button was definitely pressed at this point    
-                    cout << "Button " << thisButton.buttonName << " was pressed. Sending: " << thisButton.keypadDown << endl;
-
-                    // this spikes the cpu
-                    while(thisButton.inputState == "0") {
-                        thisButton.gpioObject->getval_gpio(thisButton.inputState);
-
-                    };
-                    cout << "Keyup: " << thisButton.keypadRelease << endl;
-                    
-                }
+            } else if(currentbuttonstate[l] == true && thisButton.inputState == "1") {
+                cout << "Pressed: " << thisButton.buttonName << " Keydown: " << thisButton.keypadDown << endl;
             }
-        }
 */
+
+/*
+            if (buttonpressed[l] == true) {
+                cout << "Pressed: " << thisButton.buttonName << " Keydown: " << thisButton.keypadDown << endl;
+            }
+*/
+
+
+        }
+
+
 
 
         // allows program to exit gracefully
