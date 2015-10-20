@@ -47,21 +47,22 @@ int main(void)
     }
 
     // experiment - gross test code please ignore
+    string pinName[10] = {"power", "aux", "1", "2", "3", "4", "5", "6", "vol +", "vol -"};
     string gpios [10] = {"13", "6", "25", "22", "17", "16", "12", "5", "24", "27"};
-    string keyDown [10] = {"c", "", "", "", "", "", "", "", "", ""};
-    string keyUP [10] = {"C", "", "", "", "", "", "", "", "", ""};
+    string keyDown [10] = {"c", "m", "g", "f", "b", "k", "j", "i", "a", "e"};
+    string keyUP [10] = {"C", "M", "G", "F", "B", "K", "J", "I", "A", "E"};
     //std::map<string, GPIOClass*> my_gpios;
     Button instances [10]; //this will hold our structs
 
     for (int i = 0; i < 10; i++) {
         cout << gpios[i] << endl;
-        instances[i].buttonName = "my button";
+        instances[i].buttonName = pinName[i];
         instances[i].gpio = gpios[i]; 
         instances[i].gpioObject = new GPIOClass(gpios[i]);
         instances[i].gpioObject->export_gpio();
         instances[i].gpioObject->setdir_gpio("in");
-        instances[i].keypadDown = "key down"; 
-        instances[i].keypadRelease = "key up"; 
+        instances[i].keypadDown = keyDown[i]; 
+        instances[i].keypadRelease = keyUp[i]; 
     }
     //end experiment
 
