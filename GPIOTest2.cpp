@@ -46,13 +46,12 @@ int main(void)
         return -1; 
     }
 
-    // experiment - gross test code please ignore
-    string pinName[10] = {"power", "aux", "1", "2", "3", "4", "5", "6", "vol +", "vol -"};
-    string gpios [10] = {"13", "6", "25", "22", "17", "16", "12", "5", "24", "27"};
+
+    string pinName[10]  = {"power", "aux", "1", "2", "3", "4", "5", "6", "vol +", "vol -"};
+    string gpios [10]   = {"13", "16", "6", "25", "22", "12", "5", "24", "17", "27"};
     string keyDown [10] = {"c", "m", "g", "f", "b", "k", "j", "i", "a", "e"};
-    string keyUP [10] = {"C", "M", "G", "F", "B", "K", "J", "I", "A", "E"};
-    //std::map<string, GPIOClass*> my_gpios;
-    Button instances [10]; //this will hold our structs
+    string keyUp [10]   = {"C", "M", "G", "F", "B", "K", "J", "I", "A", "E"};
+    Button instances [10]; //hold our structs
 
     for (int i = 0; i < 10; i++) {
         cout << gpios[i] << endl;
@@ -64,9 +63,6 @@ int main(void)
         instances[i].keypadDown = keyDown[i]; 
         instances[i].keypadRelease = keyUp[i]; 
     }
-    //end experiment
-
-    string inputstate1;
 
 
     cout << " gpio pins exported and direction set" << endl;
@@ -105,12 +101,14 @@ int main(void)
                 thisButton.gpioObject->getval_gpio(thisButton.inputState); 
                 if (thisButton.inputState == "0") {
                     // button was definitely pressed at this point    
-                    cout << "Button " << thisButton.gpio << " was pressed." << endl;
+                    cout << "Button " << thisButton.buttonName << " was pressed. Sending: " << thisButton.keypadDown << endl;
 
                     // this spikes the cpu
                     while(thisButton.inputState == "0") {
                         thisButton.gpioObject->getval_gpio(thisButton.inputState);
+
                     };
+                    cout << "Keyup: " << thisButton.keypadRelease << endl;
                     
                 }
             }
@@ -119,11 +117,10 @@ int main(void)
 
         // allows program to exit gracefully
         if(ctrl_c_pressed) {
-            // we should store each gpio object in an array and loop through it
             cout << "Ctrl^C pressed" << endl;
             cout << "unexporting pins and deallocating gpi objects" << endl;
 
-            // attempt to clean up my mess lol
+            // attempt to clean up my mess
             for (int j = 0; j < 10; j++) {
                 instances[j].gpioObject->unexport_gpio();
                 delete instances[j].gpioObject;
