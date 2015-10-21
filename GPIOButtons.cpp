@@ -4,9 +4,12 @@
  *
  *
  */
+#include <fcntl.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include <iostream>
 #include <map>
-#include <unistd.h>
+#include <sys/stat.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,6 +36,8 @@ struct Button
 int main(void)
 {
     const int MAX_BUTTONS=10;
+    const char * FIFO = "/tmp/myfifo";
+    int fd;
 
     struct sigaction sig_struct;
     sig_struct.sa_handler = sig_handler;
@@ -43,6 +48,11 @@ int main(void)
         cout << "Problem with sigaction" << endl;
         return -1; 
     }
+
+
+    // create our named pipe
+    mkfifo(FIFO, 0666);
+    fd = open(FIFO, O_WRONLY | O_SYNC);
 
 
     string pinName[10]  = {"power", "aux", "1", "2", "3", "4", "5", "6", "vol +", "vol -"};
@@ -119,10 +129,13 @@ int main(void)
                 {
                     if ( buttonpressed[ii] == true )
                     {
-                        cout << instances[ii].buttonName << " pressed. Letter: " << instances[ii].keypadDown << endl;
+                        //cout << instances[ii].buttonName << " pressed. Letter: " << instances[ii].keypadDown << endl;
+                        write(fd, instances[ii].keypadDown.c_str(), sizeof(instances[ii].keypadDown));
+
                     }
                     else {
-                        cout << instances[ii].buttonName << " depressed. Letter: " << instances[ii].keypadRelease << endl;
+                        //cout << instances[ii].buttonName << " depressed. Letter: " << instances[ii].keypadRelease << endl;
+                        write(fd, instances[ii].keypadRelease.c_str(), sizeof(instances[ii].keypadRelease));
                     }
                     buttonstate[ii] = buttonpressed[ii];
                 }
@@ -143,6 +156,8 @@ int main(void)
                 delete instances[j].gpioObject;
                 instances[j].gpioObject = 0;
             }
+            close(fd);
+            unlink(FIFO);
             break;
         }
 
